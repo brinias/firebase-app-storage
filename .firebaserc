@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "brinias-project",
+    "brinias2": "brinias-project2"
+  },
+  "targets": {}
+}

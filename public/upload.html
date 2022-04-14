@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html><head>
+    <style>
+        .button {
+          border: none;
+          color: white;
+          padding: 15px 32px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 16px;
+          margin: 4px 2px;
+          cursor: pointer;
+        }
+        
+        .button1 {background-color: #4CAF50;} /* Green */
+        .button2 {background-color: #008CBA;} /* Blue */
+        </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to Firebase Hosting</title>
+
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/9.6.10/firebase-app-compat.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/9.6.10/firebase-auth-compat.js"></script>
+    <script defer src="/__/firebase/9.6.10/firebase-database-compat.js"></script>
+    <script defer src="/__/firebase/9.6.10/firebase-firestore-compat.js"></script>
+    <script defer src="/__/firebase/9.6.10/firebase-functions-compat.js"></script>
+    <script defer src="/__/firebase/9.6.10/firebase-messaging-compat.js"></script>
+    <script defer src="/__/firebase/9.6.10/firebase-storage-compat.js"></script>
+    <script defer src="/__/firebase/9.6.10/firebase-analytics-compat.js"></script>
+    <script defer src="/__/firebase/9.6.10/firebase-remote-config-compat.js"></script>
+    <script defer src="/__/firebase/9.6.10/firebase-performance-compat.js"></script>
+    <!-- 
+      initialize the SDK after all desired features are loaded, set useEmulator to false
+      to avoid connecting the SDK to running emulators.
+    -->
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+
+    <style media="screen">
+      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
+      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
+      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
+      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
+      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+      @media (max-width: 600px) {
+        body, #message { margin-top: 0; background: white; box-shadow: none; }
+        body { border-top: 16px solid #ffa100; }
+      }
+    </style>
+<meta name="viewport" content="width=device-width, initial-scale=4, maximum-scale=1" />
+</head><body>
+
+<div align="center">
+    <h1>Upload your files</h1>
+<input type="file" id="files" multiple onchange="validate()" accept=".png,.jpg,.mp3,.wav,.xlsx,.xls,.doc, .docx,.ppt, .pptx,.pdf" /><br /><br />
+<p id="uploading"></p>
+<progress value="0" max="100" id="progress"></progress><br>
+<button class="button button2" id="send">Upload</button>
+
+<br><button class="button button2" onclick="history.back()" id="kostas1"> Back </button>
+
+<br /><br /><br /><br />
+
+<!--<input type="text" name="nombre" id="name" value ="hello.wav" /><br /><br />
+<button id="get_url">Get url file</button>
+<p id="response"></p>
+
+<button id="list_files">List files</button>
+<p id="response_list"></p>
+</div>-->
+
+<script src="https://www.gstatic.com/firebasejs/7.15.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.15.1/firebase-storage.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
+
+<script>
+
+function validate() {
+  var fileName = document.getElementById("files").value;
+  var dot = fileName.lastIndexOf(".") + 1;
+  var extFile = fileName.substr(dot, fileName.length).toLowerCase();
+  if (extFile == "jpg" || extFile == "jpeg"|| extFile == "png"|| extFile == "doc"|| extFile == "docx" || extFile == "pdf"|| extFile == "xls"|| extFile == "xlsx"|| extFile == "mp3"|| extFile == "wav"|| extFile == "ppt"|| extFile == "pptx") {
+   //accepted
+  } else {
+   alert("This file type is not allowed!");
+  }
+ }
+
+
+</script>
+
+
+<script>
+ 
+  firebase.initializeApp(firebaseConfig);
+</script>
+
+<script>
+//// CHOICE /////
+var files = [];
+document.getElementById("files").addEventListener("change", function(e) {
+  files = e.target.files;
+});
+
+///// SEND FILES //////
+document.getElementById("send").addEventListener("click", function() {
+
+  if (files.length != 0) {
+    for (let i = 0; i < files.length; i++) {
+     var storage = firebase.storage().ref(`users/${firebase.auth().currentUser.uid}/`+files[i].name);
+     // var storage = firebase.storage().ref(`users/${firebase.auth().currentUser.uid}/${file[i].name}`)
+      var upload = storage.put(files[i]);
+      upload.on("state_changed", function progress(snapshot) {
+          var percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          document.getElementById("progress").value = percentage;
+        },
+
+        function error() {alert("Error uploading file.");},
+
+        function complete() {document.getElementById( "uploading").innerHTML += `${files[i].name} uploaded <br />`;}); }
+		
+    } else {alert("No file chosen."); }
+});
+////////////////////////////////////
+
+// GET URL ////////////////////
+document.getElementById("get_url").addEventListener("click", function() {
+  var get_url_file = document.getElementById("name").value;
+  var storage = firebase.storage().ref(get_url_file);
+  storage.getDownloadURL().then(function(url) {document.getElementById("response").innerHTML += `${url}  <br />`; })
+                                         .catch(function(error) {alert("Error encountered."); });
+
+});
+////////////////////////////////////
+
+
+// LIST FILES ////////////////////
+document.getElementById("list_files").addEventListener("click", function() {
+  var storageRef = firebase.storage().ref();
+  storageRef.listAll().then(function(result) {
+  result.items.forEach(function(urlFile) {document.getElementById("response_list").innerHTML +=  `${urlFile}  <br />`; });
+                              }).catch(function(error) {alert("No file chosen."); });											
+});
+
+////////////////////////////////////
+</script>
+</body>
+</html>
